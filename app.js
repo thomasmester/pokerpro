@@ -94,17 +94,26 @@ $('calculate-btn').addEventListener('click', () => {
   // Validate: total cash-out should equal total buy-in (within rounding tolerance)
   const totalBuyIn = players.reduce((s, p) => s + p.totalInvested, 0);
   const totalCashOut = players.reduce((s, p) => s + p.cashOut, 0);
-  const diff = Math.abs(totalCashOut - totalBuyIn);
-  if (diff > 0.01 * players.length) {
+  const rawDiff = totalCashOut - totalBuyIn; // positive = fichas de mas, negative = fichas faltantes
+  const absDiff = Math.abs(rawDiff);
+  let discrepancy = 0;
+
+  if (absDiff > 0.01 * players.length) {
     const ok = confirm(
-      `Atencion: el total de fichas (${fmt(totalCashOut)}) no coincide con el total de buy-ins (${fmt(totalBuyIn)}).\n` +
-      `Diferencia: ${fmt(totalCashOut - totalBuyIn)}.\n¿Continuar igual?`
+      `Atencion: el total de fichas (${fmt(totalCashOut)}) no coincide con el total invertido (${fmt(totalBuyIn)}).\n` +
+      `Diferencia: ${rawDiff < 0 ? '-' : '+'}${fmt(absDiff)}.\n\n` +
+      `La diferencia se distribuira en partes iguales entre todos los jugadores.\n¿Continuar?`
     );
     if (!ok) return;
+    discrepancy = rawDiff; // se absorbe proporcionalmente abajo
   }
 
+  // Distribuir discrepancia en partes iguales para que la suma de nets sea siempre 0
+  const adjustPerPlayer = discrepancy / players.length;
+  players = players.map(p => ({ ...p, net: p.net - adjustPerPlayer }));
+
   const transfers = minimizeTransfers(players.map(p => ({ name: p.name, balance: p.net })));
-  renderResults(players, transfers);
+  renderResults(players, transfers, rawDiff);
 
   $('players-section').classList.add('hidden');
   $('results-section').classList.remove('hidden');
@@ -154,9 +163,19 @@ function fmt(n) {
   return '$' + Math.abs(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function renderResults(players, transfers) {
+function renderResults(players, transfers, rawDiff = 0) {
+  const absDiff = Math.abs(rawDiff);
+  const adjustPerPlayer = rawDiff / players.length;
+
   // Balances table
   const container = $('balances-table');
+
+  const discrepancyBanner = absDiff > 0.01 ? `
+    <div class="discrepancy-banner">
+      Fichas ${rawDiff < 0 ? 'faltantes' : 'sobrantes'}: <strong>${rawDiff < 0 ? '-' : '+'}${fmt(absDiff)}</strong>
+      — distribuido ${fmt(Math.abs(adjustPerPlayer))} por jugador
+    </div>` : '';
+
   const tableRows = players.map(p => {
     const cls = p.net > 0.005 ? 'balance-pos' : p.net < -0.005 ? 'balance-neg' : 'balance-zero';
     const sign = p.net > 0.005 ? '+' : '';
@@ -172,6 +191,7 @@ function renderResults(players, transfers) {
   }).join('');
 
   container.innerHTML = `
+    ${discrepancyBanner}
     <table class="balance-table">
       <thead>
         <tr>
