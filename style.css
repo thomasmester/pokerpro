@@ -267,6 +267,16 @@ input::placeholder {
 
 .balance-table tr:last-child td { border-bottom: none; }
 
+.discrepancy-banner {
+  background: rgba(201,162,39,0.12);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  color: var(--gold-light);
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
 .balance-pos { color: var(--green-light); font-weight: 700; }
 .balance-neg { color: var(--red-light); font-weight: 700; }
 .balance-zero { color: var(--text-muted); font-weight: 600; }
