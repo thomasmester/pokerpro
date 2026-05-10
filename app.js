@@ -8,15 +8,15 @@ let players = [];
 // ── Setup ──────────────────────────────────────────────────────────────────
 
 $('setup-btn').addEventListener('click', () => {
-  const buyIn = parseFloat($('buy-in').value);
   const initialPoints = parseFloat($('initial-points').value);
+  const chipRate = parseFloat($('chip-rate').value);
   const count = parseInt($('player-count').value);
 
-  if (!buyIn || buyIn <= 0) return alert('Ingresa un buy-in valido.');
   if (!initialPoints || initialPoints <= 0) return alert('Ingresa los puntos iniciales.');
+  if (!chipRate || chipRate <= 0) return alert('Ingresa una tasa valida.');
   if (!count || count < 2) return alert('Minimo 2 jugadores.');
 
-  const chipRate = buyIn / initialPoints;
+  const buyIn = initialPoints * chipRate;
   config = { buyIn, initialPoints, chipRate, playerCount: count };
   players = [];
 
@@ -248,8 +248,8 @@ $('new-game-btn').addEventListener('click', () => {
 })();
 
 function resetAll() {
-  $('buy-in').value = '';
   $('initial-points').value = '';
+  $('chip-rate').value = '';
   $('player-count').value = '';
   $('results-section').classList.add('hidden');
   $('players-section').classList.add('hidden');
