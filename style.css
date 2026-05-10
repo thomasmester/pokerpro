@@ -262,6 +262,26 @@ input::placeholder {
   margin-left: 6px;
 }
 
+.game-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.info-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 4px 12px;
+}
+
+.info-chip strong {
+  color: var(--gold-light);
+}
+
 select {
   background: var(--bg);
   border: 1px solid var(--border);
