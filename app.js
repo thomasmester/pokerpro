@@ -219,6 +219,34 @@ $('new-game-btn').addEventListener('click', () => {
   if (confirm('Empezar nueva partida?')) resetAll();
 });
 
+// ── Gallery ────────────────────────────────────────────────────────────────
+
+(function () {
+  const track = $('gallery-track');
+  const dots = [...document.querySelectorAll('.dot')];
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const i = parseInt(dot.dataset.i);
+      track.scrollTo({ left: track.clientWidth * i, behavior: 'smooth' });
+    });
+  });
+
+  track.addEventListener('scroll', () => {
+    const i = Math.round(track.scrollLeft / track.clientWidth);
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+  });
+
+  // Auto-advance every 4 seconds
+  let timer = setInterval(() => {
+    const i = Math.round(track.scrollLeft / track.clientWidth);
+    const next = (i + 1) % dots.length;
+    track.scrollTo({ left: track.clientWidth * next, behavior: 'smooth' });
+  }, 4000);
+
+  track.addEventListener('pointerdown', () => clearInterval(timer));
+})();
+
 function resetAll() {
   $('buy-in').value = '';
   $('initial-points').value = '';
