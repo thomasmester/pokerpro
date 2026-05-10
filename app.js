@@ -2,24 +2,30 @@
 
 const $ = id => document.getElementById(id);
 
-let config = { buyIn: 0, chipRate: 0, playerCount: 0 };
+let config = { buyIn: 0, initialPoints: 0, chipRate: 0, playerCount: 0 };
 let players = [];
 
 // ── Setup ──────────────────────────────────────────────────────────────────
 
 $('setup-btn').addEventListener('click', () => {
   const buyIn = parseFloat($('buy-in').value);
-  const chipRate = parseFloat($('chip-rate').value);
+  const initialPoints = parseFloat($('initial-points').value);
   const count = parseInt($('player-count').value);
 
   if (!buyIn || buyIn <= 0) return alert('Ingresa un buy-in valido.');
-  if (!chipRate || chipRate <= 0) return alert('Ingresa una tasa valida.');
+  if (!initialPoints || initialPoints <= 0) return alert('Ingresa los puntos iniciales.');
   if (!count || count < 2) return alert('Minimo 2 jugadores.');
 
-  config = { buyIn, chipRate, playerCount: count };
+  const chipRate = buyIn / initialPoints;
+  config = { buyIn, initialPoints, chipRate, playerCount: count };
   players = [];
 
   buildPlayerList(count);
+  $('game-info').innerHTML = `
+    <span class="info-chip">Buy-in: <strong>${fmt(buyIn)}</strong></span>
+    <span class="info-chip">Puntos iniciales: <strong>${initialPoints.toLocaleString()}</strong></span>
+    <span class="info-chip">Tasa: <strong>${fmt(chipRate)}/pto</strong></span>
+  `;
   $('setup-section').classList.add('hidden');
   $('players-section').classList.remove('hidden');
   $('results-section').classList.add('hidden');
@@ -43,7 +49,7 @@ function addPlayerRow(num) {
       <input type="text" class="p-name" placeholder="Jugador ${num}" />
     </div>
     <div class="form-row">
-      <label>Fichas finales</label>
+      <label>Puntos finales</label>
       <input type="number" class="p-chips" min="0" step="1" placeholder="0" />
     </div>
     <div class="form-row">
@@ -158,7 +164,7 @@ function renderResults(players, transfers) {
     return `
       <tr>
         <td>${p.name}</td>
-        <td>${p.chips.toLocaleString()} fichas</td>
+        <td>${p.chips.toLocaleString()} pts</td>
         <td>${fmt(p.totalInvested)}${rebuyLabel}</td>
         <td>${fmt(p.cashOut)}</td>
         <td class="${cls}">${sign}${fmt(p.net)}</td>
@@ -170,7 +176,7 @@ function renderResults(players, transfers) {
       <thead>
         <tr>
           <th>Jugador</th>
-          <th>Fichas</th>
+          <th>Puntos</th>
           <th>Invertido</th>
           <th>Cash-out</th>
           <th>Resultado</th>
@@ -215,7 +221,7 @@ $('new-game-btn').addEventListener('click', () => {
 
 function resetAll() {
   $('buy-in').value = '';
-  $('chip-rate').value = '';
+  $('initial-points').value = '';
   $('player-count').value = '';
   $('results-section').classList.add('hidden');
   $('players-section').classList.add('hidden');
