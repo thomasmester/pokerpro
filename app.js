@@ -46,6 +46,14 @@ function addPlayerRow(num) {
       <label>Fichas finales</label>
       <input type="number" class="p-chips" min="0" step="1" placeholder="0" />
     </div>
+    <div class="form-row">
+      <label>Recompra</label>
+      <select class="p-rebuy">
+        <option value="0">Sin recompra</option>
+        <option value="0.5">50% del buy-in</option>
+        <option value="1">100% del buy-in</option>
+      </select>
+    </div>
     <button class="remove-btn" title="Eliminar">✕</button>
   `;
   div.querySelector('.remove-btn').addEventListener('click', () => {
@@ -69,13 +77,16 @@ $('calculate-btn').addEventListener('click', () => {
     const name = row.querySelector('.p-name').value.trim() || `Jugador ${i + 1}`;
     const chips = parseFloat(row.querySelector('.p-chips').value);
     if (isNaN(chips) || chips < 0) throw new Error(`Fichas invalidas para ${name}`);
+    const rebuyFactor = parseFloat(row.querySelector('.p-rebuy').value);
+    const rebuyAmount = config.buyIn * rebuyFactor;
+    const totalInvested = config.buyIn + rebuyAmount;
     const cashOut = chips * config.chipRate;
-    const net = cashOut - config.buyIn;
-    return { name, chips, cashOut, net };
+    const net = cashOut - totalInvested;
+    return { name, chips, cashOut, rebuyAmount, totalInvested, net };
   });
 
   // Validate: total cash-out should equal total buy-in (within rounding tolerance)
-  const totalBuyIn = players.length * config.buyIn;
+  const totalBuyIn = players.reduce((s, p) => s + p.totalInvested, 0);
   const totalCashOut = players.reduce((s, p) => s + p.cashOut, 0);
   const diff = Math.abs(totalCashOut - totalBuyIn);
   if (diff > 0.01 * players.length) {
@@ -140,13 +151,15 @@ function fmt(n) {
 function renderResults(players, transfers) {
   // Balances table
   const container = $('balances-table');
-  const rows = players.map(p => {
+  const tableRows = players.map(p => {
     const cls = p.net > 0.005 ? 'balance-pos' : p.net < -0.005 ? 'balance-neg' : 'balance-zero';
     const sign = p.net > 0.005 ? '+' : '';
+    const rebuyLabel = p.rebuyAmount > 0 ? `<span class="summary-chip">+${fmt(p.rebuyAmount)}</span>` : '';
     return `
       <tr>
         <td>${p.name}</td>
         <td>${p.chips.toLocaleString()} fichas</td>
+        <td>${fmt(p.totalInvested)}${rebuyLabel}</td>
         <td>${fmt(p.cashOut)}</td>
         <td class="${cls}">${sign}${fmt(p.net)}</td>
       </tr>`;
@@ -158,11 +171,12 @@ function renderResults(players, transfers) {
         <tr>
           <th>Jugador</th>
           <th>Fichas</th>
+          <th>Invertido</th>
           <th>Cash-out</th>
           <th>Resultado</th>
         </tr>
       </thead>
-      <tbody>${rows}</tbody>
+      <tbody>${tableRows}</tbody>
     </table>`;
 
   // Transfers
