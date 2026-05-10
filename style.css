@@ -57,6 +57,41 @@ header .subtitle {
   font-size: 0.95rem;
 }
 
+.deco-strip {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.deco-img {
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  border: 2px solid var(--border);
+  transition: transform 0.2s;
+}
+
+.deco-img:hover { transform: scale(1.04) rotate(-1deg); }
+
+.deco-think {
+  width: 160px;
+  height: 100px;
+  transform: rotate(-2deg);
+}
+
+.deco-maradona {
+  width: 140px;
+  height: 120px;
+}
+
+.deco-alfajor {
+  width: 90px;
+  height: 120px;
+  transform: rotate(2deg);
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
