@@ -119,32 +119,98 @@ const Liga = (() => {
   function premios(partidos, res, filas) {
     if (!filas.length) return [];
     const out = [];
-    const porTotal = [...filas].sort((a, b) => b.total - a.total);
-    const lider = porTotal[0];
-    if (lider.total > 0.005) out.push({ icon: '👑', titulo: 'El Lobo', quien: lider.nombre, detalle: `${fmtSigned(lider.total)} en total` });
+    const add = (icon, titulo, quien, detalle) => out.push({ icon, titulo, quien, detalle });
+    const pct = f => f.ganados / f.pj;
+    const prom = f => f.total / f.pj;
+    const pctTxt = f => `${f.ganados}/${f.pj} (${Math.round(100 * pct(f))}%)`;
+    // El primero segun fn (mayor), desempatando por mas partidos jugados
+    const top = (lista, fn) => lista.length ? [...lista].sort((a, b) => fn(b) - fn(a) || b.pj - a.pj)[0] : null;
 
-    const sponsor = porTotal[porTotal.length - 1];
-    if (sponsor.total < -0.005) out.push({ icon: '🐟', titulo: 'Sponsor oficial', quien: sponsor.nombre, detalle: `${fmtSigned(sponsor.total)}. Gracias, crack` });
-
-    let noche = null;
-    for (const p of partidos) for (const j of p.jugadores) {
-      if (!noche || j.resultado > noche.resultado) noche = { ...j, fecha: p.fecha };
-    }
-    if (noche && noche.resultado > 0.005) out.push({ icon: '🔥', titulo: 'Noche soñada', quien: noche.nombre, detalle: `${fmtSigned(noche.resultado)} el ${fechaCorta(noche.fecha)}` });
-
-    // Mejor % con un minimo de partidos, para que no gane el que vino una vez
+    // Para los premios de promedio y % hace falta un minimo de partidos,
+    // asi no gana el que vino una sola vez
     const minPj = Math.max(3, Math.ceil(Math.max(...filas.map(f => f.pj)) / 3));
     const regulares = filas.filter(f => f.pj >= minPj);
-    if (regulares.length) {
-      const fino = [...regulares].sort((a, b) => b.ganados / b.pj - a.ganados / a.pj || b.pj - a.pj)[0];
-      out.push({ icon: '🎯', titulo: 'Francotirador', quien: fino.nombre, detalle: `ganó ${fino.ganados}/${fino.pj} (${Math.round(100 * fino.ganados / fino.pj)}%)` });
-    }
 
-    const presente = [...filas].sort((a, b) => b.pj - a.pj)[0];
-    out.push({ icon: '🪑', titulo: 'No falta nunca', quien: presente.nombre, detalle: plural(presente.pj, 'partido', 'partidos') });
+    // ── Plata
+    const lobo = top(filas, f => f.total);
+    if (lobo.total > 0.005) add('👑', 'El Lobo', lobo.nombre, `${fmtSigned(lobo.total)} en total`);
+
+    const sponsor = top(filas, f => -f.total);
+    if (sponsor.total < -0.005) add('🐟', 'Sponsor oficial', sponsor.nombre, `${fmtSigned(sponsor.total)}. Gracias, crack`);
+
+    const rey = top(regulares, prom);
+    if (rey && prom(rey) > 0.005) add('📈', 'Rey del promedio', rey.nombre, `${fmtSigned(prom(rey))} por partido`);
+
+    const agujero = top(regulares, f => -prom(f));
+    if (agujero && prom(agujero) < -0.005) add('🕳️', 'Agujero negro', agujero.nombre, `${fmtSigned(prom(agujero))} por partido`);
+
+    const suiza = top(regulares, f => -Math.abs(f.total));
+    if (suiza) add('🇨🇭', 'Suiza', suiza.nombre, `${fmtSigned(suiza.total)} en ${plural(suiza.pj, 'partido', 'partidos')}. Neutral como nadie`);
+
+    // ── Porcentaje
+    const fino = top(regulares, pct);
+    if (fino) add('🎯', 'Francotirador', fino.nombre, `ganó ${pctTxt(fino)}`);
+
+    const frio = top(regulares, f => -pct(f));
+    if (frio && frio !== fino) add('🧊', 'Pecho frío', frio.nombre, `ganó ${pctTxt(frio)}`);
+
+    const tiburon = top(regulares.filter(f => f.total > 0.005 && pct(f) < 0.5), f => -pct(f));
+    if (tiburon) add('🦈', 'Pocas pero buenas', tiburon.nombre, `ganó ${pctTxt(tiburon)} y igual ${fmtSigned(tiburon.total)}`);
+
+    const chiquito = top(regulares.filter(f => f.total < -0.005 && pct(f) >= 0.4), pct);
+    if (chiquito) add('🤡', 'Gana chiquito, pierde grande', chiquito.nombre, `ganó ${pctTxt(chiquito)} y aun así ${fmtSigned(chiquito.total)}`);
+
+    const sequia = top(filas.filter(f => f.ganados === 0 && f.pj >= 2), f => f.pj);
+    if (sequia) add('🏜️', 'Sequía', sequia.nombre, `0 de ${sequia.pj}. Ni una, hermano`);
+
+    // ── Asistencia
+    const presente = top(filas, f => f.pj);
+    add('🪑', 'No falta nunca', presente.nombre, plural(presente.pj, 'partido', 'partidos'));
+
+    const principiante = top(filas.filter(f => f.pj === 1 && f.ganados === 1), f => f.total);
+    if (principiante) add('🍀', 'Suerte de principiante', principiante.nombre, `vino una vez, ganó ${fmtSigned(principiante.total)} y no se lo vio más`);
+
+    const turista = top(filas.filter(f => f.pj === 1 && f.total < -0.005), f => -f.total);
+    if (turista) add('🧳', 'Turista', turista.nombre, `vino una vez, dejó ${fmt(turista.total)} y se volvió a su país`);
+
+    // ── Noche a noche (solo con partidos cargados con detalle)
+    let mejorNoche = null, peorNoche = null;
+    for (const p of partidos) for (const j of p.jugadores) {
+      if (!mejorNoche || j.resultado > mejorNoche.resultado) mejorNoche = { ...j, fecha: p.fecha };
+      if (!peorNoche || j.resultado < peorNoche.resultado) peorNoche = { ...j, fecha: p.fecha };
+    }
+    if (mejorNoche && mejorNoche.resultado > 0.005) add('🔥', 'Noche soñada', mejorNoche.nombre, `${fmtSigned(mejorNoche.resultado)} el ${fechaCorta(mejorNoche.fecha)}`);
+    if (peorNoche && peorNoche.resultado < -0.005) add('⛈️', 'Noche para el olvido', peorNoche.nombre, `${fmtSigned(peorNoche.resultado)} el ${fechaCorta(peorNoche.fecha)}`);
+
+    // Racha: partidos ganados seguidos de los que jugo, en orden de fecha
+    const rachas = new Map();
+    for (const p of [...partidos].sort((a, b) => a.fecha.localeCompare(b.fecha))) {
+      for (const j of p.jugadores) {
+        const r = rachas.get(clave(j.nombre)) || { nombre: j.nombre.trim(), actual: 0, max: 0 };
+        r.actual = j.resultado > 0.005 ? r.actual + 1 : 0;
+        r.max = Math.max(r.max, r.actual);
+        rachas.set(clave(j.nombre), r);
+      }
+    }
+    const racha = [...rachas.values()].sort((a, b) => b.max - a.max)[0];
+    if (racha && racha.max >= 2) add('🚀', 'Racha imparable', racha.nombre, `${racha.max} partidos ganados seguidos`);
+
+    // Recompras: puso mas que el que menos puso en esa mesa
+    const recompras = new Map();
+    for (const p of partidos) {
+      const base = Math.min(...p.jugadores.map(j => j.invertido || 0));
+      for (const j of p.jugadores) {
+        if ((j.invertido || 0) > base + 0.005) {
+          const k = clave(j.nombre);
+          recompras.set(k, { nombre: j.nombre.trim(), n: (recompras.get(k)?.n || 0) + 1 });
+        }
+      }
+    }
+    const recompra = [...recompras.values()].sort((a, b) => b.n - a.n)[0];
+    if (recompra) add('🔁', 'Cliente frecuente', recompra.nombre, `${plural(recompra.n, 'recompra', 'recompras')}. "Esta vez sí"`);
 
     const pozo = partidos.reduce((s, p) => s + p.jugadores.reduce((t, j) => t + (j.invertido || 0), 0), 0);
-    if (pozo > 0) out.push({ icon: '💸', titulo: 'Plata que giró', quien: fmt(pozo), detalle: `en ${plural(partidos.length, 'partido', 'partidos')}` });
+    if (pozo > 0) add('💸', 'Plata que giró', fmt(pozo), `en ${plural(partidos.length, 'partido', 'partidos')}`);
     return out;
   }
 
