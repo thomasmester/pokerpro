@@ -254,8 +254,13 @@ const Liga = (() => {
 
     // Premios
     const ps = premios(partidos, res, filas);
-    $('awards-card').classList.toggle('hidden', !ps.length);
-    $('awards').innerHTML = ps.map(p => `
+    if (!ps.length) {
+      const conPremios = temporadasDisponibles().find(t => t !== seleccionada && tieneDatos(t));
+      $('awards').innerHTML = `<p class="empty awards-empty">Sin premios en ${esc(nombreTemp)} todavía: nadie ganó ni perdió nada (aún).` +
+        (conPremios ? `<br><button class="season-chip active" data-ir="${esc(conPremios)}">🏆 Ver premios de la ${esc(conPremios)}</button>` : '') + '</p>';
+      $('awards').querySelectorAll('[data-ir]').forEach(b =>
+        b.addEventListener('click', () => { seleccionada = b.dataset.ir; render(); }));
+    } else $('awards').innerHTML = ps.map(p => `
       <div class="award">
         <span class="award-icon">${p.icon}</span>
         <div>

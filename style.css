@@ -818,3 +818,5 @@ input::placeholder { color: var(--text-muted); opacity: 0.55; }
 .standings-table td.sorted { background: rgba(255, 210, 87, 0.06); }
 .match-summary { padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
 .match.resumen { border-style: dashed; border-color: var(--border); }
+.awards-empty { grid-column: 1 / -1; }
+.awards-empty .season-chip { margin-top: 12px; }
