@@ -1,4 +1,139 @@
 {
   "nombre": "Liga PokerPro",
+  "resumenes": [
+    {
+      "temporada": "25/26",
+      "partidos": 17,
+      "nota": "Totales cargados desde las capturas, sin detalle partido a partido.",
+      "jugadores": [
+        {
+          "nombre": "agus",
+          "pj": 12,
+          "ganados": 6,
+          "total": 122931.05
+        },
+        {
+          "nombre": "lolo",
+          "pj": 8,
+          "ganados": 5,
+          "total": 101566.13
+        },
+        {
+          "nombre": "jaunsi",
+          "pj": 13,
+          "ganados": 8,
+          "total": 76407.76
+        },
+        {
+          "nombre": "santi",
+          "pj": 16,
+          "ganados": 6,
+          "total": 73580.92
+        },
+        {
+          "nombre": "cacu",
+          "pj": 11,
+          "ganados": 7,
+          "total": 29953.66
+        },
+        {
+          "nombre": "toba",
+          "pj": 1,
+          "ganados": 1,
+          "total": 26321.43
+        },
+        {
+          "nombre": "tomi",
+          "pj": 5,
+          "ganados": 2,
+          "total": 11838.47
+        },
+        {
+          "nombre": "facu",
+          "pj": 11,
+          "ganados": 6,
+          "total": 11186.23
+        },
+        {
+          "nombre": "teo",
+          "pj": 7,
+          "ganados": 4,
+          "total": 7279.48
+        },
+        {
+          "nombre": "tati",
+          "pj": 2,
+          "ganados": 1,
+          "total": 4760.0
+        },
+        {
+          "nombre": "adam",
+          "pj": 1,
+          "ganados": 0,
+          "total": -774.67
+        },
+        {
+          "nombre": "tato",
+          "pj": 2,
+          "ganados": 1,
+          "total": -3262.0
+        },
+        {
+          "nombre": "andrés",
+          "pj": 1,
+          "ganados": 0,
+          "total": -10338.67
+        },
+        {
+          "nombre": "fela",
+          "pj": 2,
+          "ganados": 1,
+          "total": -14732.17
+        },
+        {
+          "nombre": "leo",
+          "pj": 1,
+          "ganados": 0,
+          "total": -15688.4
+        },
+        {
+          "nombre": "valentin",
+          "pj": 1,
+          "ganados": 0,
+          "total": -16068.0
+        },
+        {
+          "nombre": "joaco",
+          "pj": 17,
+          "ganados": 6,
+          "total": -41994.08
+        },
+        {
+          "nombre": "seba",
+          "pj": 4,
+          "ganados": 0,
+          "total": -49260.69
+        },
+        {
+          "nombre": "santino",
+          "pj": 8,
+          "ganados": 2,
+          "total": -50088.93
+        },
+        {
+          "nombre": "pedro",
+          "pj": 8,
+          "ganados": 4,
+          "total": -73817.28
+        },
+        {
+          "nombre": "lauti",
+          "pj": 12,
+          "ganados": 2,
+          "total": -151892.11
+        }
+      ]
+    }
+  ],
   "partidos": []
 }
