@@ -811,3 +811,10 @@ input::placeholder { color: var(--text-muted); opacity: 0.55; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* Orden de la tabla y resumenes historicos */
+.sort-chips { margin-bottom: 8px; }
+.season-chip.small { font-size: 0.78rem; padding: 6px 12px; }
+.standings-table td.sorted { background: rgba(255, 210, 87, 0.06); }
+.match-summary { padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.match.resumen { border-style: dashed; border-color: var(--border); }
