@@ -1,5 +1,8 @@
 {
   "nombre": "Liga PokerPro",
+  "alias": {
+    "valentin": "jaunsi"
+  },
   "resumenes": [
     {
       "temporada": "25/26",
@@ -20,9 +23,9 @@
         },
         {
           "nombre": "jaunsi",
-          "pj": 13,
+          "pj": 14,
           "ganados": 8,
-          "total": 76407.76
+          "total": 60339.76
         },
         {
           "nombre": "santi",
@@ -95,12 +98,6 @@
           "pj": 1,
           "ganados": 0,
           "total": -15688.4
-        },
-        {
-          "nombre": "valentin",
-          "pj": 1,
-          "ganados": 0,
-          "total": -16068.0
         },
         {
           "nombre": "joaco",

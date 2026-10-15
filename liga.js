@@ -12,6 +12,7 @@ const Liga = (() => {
   };
   let nombreLiga = 'Liga PokerPro';
   let guardados = [];
+  let alias = {}; // apodo -> nombre oficial, ej: { "valentin": "jaunsi" }
   let resumenes = [];
   let pendientes = [];
   let seleccionada = null;
@@ -29,7 +30,9 @@ const Liga = (() => {
 
   const temporadaActual = () => temporadaDe({ fecha: todayISO() });
   const todos = () => [...guardados, ...pendientes];
-  const clave = nombre => nombre.trim().toLowerCase();
+  const clave = nombre => nombre.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const canon = nombre => alias[clave(nombre)] || nombre.trim();
+  const unificar = x => ({ ...x, jugadores: x.jugadores.map(j => ({ ...j, nombre: canon(j.nombre) })) });
   const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`;
 
   function fechaLinda(iso) {
@@ -48,8 +51,9 @@ const Liga = (() => {
       if (!r.ok) throw new Error(r.status);
       const data = await r.json();
       nombreLiga = data.nombre || nombreLiga;
-      guardados = (data.partidos || []).filter(p => p && p.fecha && Array.isArray(p.jugadores));
-      resumenes = (data.resumenes || []).filter(r => r && r.temporada && Array.isArray(r.jugadores));
+      alias = Object.fromEntries(Object.entries(data.alias || {}).map(([k, v]) => [clave(k), v]));
+      guardados = (data.partidos || []).filter(p => p && p.fecha && Array.isArray(p.jugadores)).map(unificar);
+      resumenes = (data.resumenes || []).filter(r => r && r.temporada && Array.isArray(r.jugadores)).map(unificar);
       estado = 'ok';
     } catch (e) {
       estado = 'error';
@@ -58,7 +62,7 @@ const Liga = (() => {
   }
 
   function agregarPendiente(partido) {
-    pendientes.push({ ...partido, _pendiente: true });
+    pendientes.push({ ...unificar(partido), _pendiente: true });
     seleccionada = temporadaDe(partido);
     render();
     return seleccionada;
@@ -68,7 +72,12 @@ const Liga = (() => {
     const partidos = todos()
       .map(({ _pendiente, ...p }) => p)
       .sort((a, b) => a.fecha.localeCompare(b.fecha));
-    const data = { nombre: nombreLiga, ...(resumenes.length ? { resumenes } : {}), partidos };
+    const data = {
+      nombre: nombreLiga,
+      ...(Object.keys(alias).length ? { alias } : {}),
+      ...(resumenes.length ? { resumenes } : {}),
+      partidos,
+    };
     return JSON.stringify(data, null, 2) + '\n';
   }
 
