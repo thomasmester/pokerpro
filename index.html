@@ -3,73 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PokerPro - Calculadora de Deudas</title>
+  <meta name="theme-color" content="#06140d" />
+  <title>PokerPro - La timba entre amigos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="suits-bg" aria-hidden="true"></div>
+
   <div class="container">
-    <header>
+    <header class="marquee">
+      <div class="bulbs" aria-hidden="true"></div>
+      <p class="eyebrow">♠ ♥ Casino de amigos ♦ ♣</p>
       <h1>PokerPro</h1>
-      <p class="subtitle">Calculadora de deudas para poker entre amigos</p>
+      <p class="tagline" id="tagline">La casa siempre gana. Acá la casa es el que trae las fichas.</p>
+      <div class="bulbs bottom" aria-hidden="true"></div>
     </header>
 
-    <div class="gallery">
-      <div class="gallery-track" id="gallery-track">
-        <div class="gallery-slide">
-          <img src="img-pensando.jpeg" alt="pensando" />
-        </div>
-        <div class="gallery-slide">
-          <img src="img-maradona.jpeg" alt="maradona" />
-        </div>
-        <div class="gallery-slide">
-          <img src="img-jorgelin.jpeg" alt="jorgelin" />
-        </div>
-      </div>
-      <div class="gallery-dots" id="gallery-dots">
-        <span class="dot active" data-i="0"></span>
-        <span class="dot" data-i="1"></span>
-        <span class="dot" data-i="2"></span>
-      </div>
-    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" role="tab" data-tab="mesa" aria-selected="true">🃏 Mesa</button>
+      <button class="tab" role="tab" data-tab="liga" aria-selected="false">🏆 Liga <span class="tab-badge hidden" id="liga-badge"></span></button>
+    </nav>
 
-    <section class="setup-section card" id="setup-section">
-      <h2>Configuracion de la partida</h2>
-      <div class="form-row">
-        <label for="initial-points">Puntos iniciales por jugador</label>
-        <input type="number" id="initial-points" min="1" step="1" placeholder="ej: 100" />
-      </div>
-      <div class="form-row">
-        <label for="chip-rate">Tasa ($ por punto)</label>
-        <input type="number" id="chip-rate" min="0" step="0.01" placeholder="ej: 10" />
-      </div>
-      <div class="form-row">
-        <label for="player-count">Cantidad de jugadores</label>
-        <input type="number" id="player-count" min="2" max="20" placeholder="ej: 4" />
-      </div>
-      <button class="btn btn-primary" id="setup-btn">Crear mesa</button>
-    </section>
+    <!-- ───────────────────────── MESA ───────────────────────── -->
+    <main id="tab-mesa" class="tab-panel">
 
-    <section class="players-section card hidden" id="players-section">
-      <h2>Jugadores</h2>
-      <div class="game-info" id="game-info"></div>
-      <div id="players-list"></div>
-      <button class="btn btn-secondary" id="add-player-btn">+ Agregar jugador</button>
-      <div class="divider"></div>
-      <button class="btn btn-primary" id="calculate-btn">Calcular deudas</button>
-      <button class="btn btn-ghost" id="reset-btn">Reiniciar</button>
-    </section>
+      <div class="gallery">
+        <div class="gallery-track" id="gallery-track">
+          <figure class="gallery-slide">
+            <img src="img-pensando.jpeg" alt="pensando" />
+            <figcaption>Cuando te hacen all-in y tenés 7-2 off-suit</figcaption>
+          </figure>
+          <figure class="gallery-slide">
+            <img src="img-maradona.jpeg" alt="maradona" />
+            <figcaption>La mano de Dios... en el river</figcaption>
+          </figure>
+          <figure class="gallery-slide">
+            <img src="img-jorgelin.jpeg" alt="jorgelin" />
+            <figcaption>Contando las fichas por tercera vez</figcaption>
+          </figure>
+        </div>
+        <div class="gallery-dots" id="gallery-dots">
+          <span class="dot active" data-i="0"></span>
+          <span class="dot" data-i="1"></span>
+          <span class="dot" data-i="2"></span>
+        </div>
+      </div>
 
-    <section class="results-section card hidden" id="results-section">
-      <h2>Resumen de la partida</h2>
-      <div id="balances-table"></div>
-      <div class="divider"></div>
-      <h2>Transferencias (minimas)</h2>
-      <div id="transfers-list"></div>
-      <button class="btn btn-ghost" id="back-btn">Volver a editar</button>
-      <button class="btn btn-ghost" id="new-game-btn">Nueva partida</button>
-    </section>
+      <section class="card" id="setup-section">
+        <h2><span class="suit">♠</span> Armá la mesa</h2>
+        <p class="hint">Definí cuánto vale cada ficha antes de que alguien diga "dale, después vemos".</p>
+        <div class="form-row">
+          <label for="initial-points">Puntos iniciales por jugador</label>
+          <input type="number" id="initial-points" min="1" step="1" inputmode="numeric" placeholder="ej: 100" />
+        </div>
+        <div class="form-row">
+          <label for="chip-rate">Tasa ($ por punto)</label>
+          <input type="number" id="chip-rate" min="0" step="0.01" inputmode="decimal" placeholder="ej: 10" />
+        </div>
+        <div class="form-row">
+          <label for="player-count">Cantidad de jugadores</label>
+          <input type="number" id="player-count" min="2" max="20" inputmode="numeric" placeholder="ej: 4" />
+        </div>
+        <button class="btn btn-primary" id="setup-btn">🎲 Repartir las cartas</button>
+      </section>
+
+      <section class="card hidden" id="players-section">
+        <h2><span class="suit red">♥</span> Los timberos</h2>
+        <div class="game-info" id="game-info"></div>
+        <div id="players-list"></div>
+        <button class="btn btn-secondary" id="add-player-btn">+ Se sumó otro valiente</button>
+        <div class="divider"></div>
+        <button class="btn btn-primary" id="calculate-btn">💰 ¿Quién garpa?</button>
+        <button class="btn btn-ghost" id="reset-btn">Reiniciar</button>
+      </section>
+
+      <section class="card hidden" id="results-section">
+        <h2><span class="suit red">♦</span> El veredicto</h2>
+        <div id="verdict"></div>
+        <div id="balances-table"></div>
+        <div class="divider"></div>
+        <h2><span class="suit">♣</span> A garpar</h2>
+        <p class="hint">La menor cantidad de transferencias posible, para que nadie tenga excusas.</p>
+        <div id="transfers-list"></div>
+
+        <div class="divider"></div>
+        <div class="league-add" id="league-add">
+          <h3>🏆 Sumar a la liga</h3>
+          <div class="league-add-grid">
+            <div class="form-row">
+              <label for="match-date">Fecha</label>
+              <input type="date" id="match-date" />
+            </div>
+            <div class="form-row">
+              <label for="match-note">Dónde / nota (opcional)</label>
+              <input type="text" id="match-note" maxlength="60" placeholder="ej: en lo de Tomi" />
+            </div>
+          </div>
+          <button class="btn btn-gold-outline" id="add-to-league-btn">Anotar en la temporada</button>
+          <div class="export hidden" id="league-export">
+            <p class="hint" id="export-msg"></p>
+            <textarea id="export-json" readonly rows="6" aria-label="liga.json actualizado"></textarea>
+            <div class="export-actions">
+              <button class="btn btn-secondary" id="copy-json-btn">📋 Copiar liga.json</button>
+              <a class="btn btn-secondary" id="edit-github-link" href="https://github.com/thomasmester/pokerpro/edit/main/liga.json" target="_blank" rel="noopener">✏️ Abrir en GitHub</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <button class="btn btn-ghost" id="back-btn">Volver a editar</button>
+        <button class="btn btn-ghost" id="new-game-btn">Nueva partida</button>
+      </section>
+    </main>
+
+    <!-- ───────────────────────── LIGA ───────────────────────── -->
+    <main id="tab-liga" class="tab-panel hidden">
+      <section class="card">
+        <h2><span class="suit">♠</span> Liga PokerPro</h2>
+        <div class="season-chips" id="season-chips"></div>
+        <div id="league-status"></div>
+      </section>
+
+      <section class="card" id="awards-card">
+        <h2><span class="suit red">♥</span> Premios de la temporada</h2>
+        <div class="awards" id="awards"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="suit red">♦</span> Tabla de posiciones</h2>
+        <div id="standings"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="suit">♣</span> Partidos</h2>
+        <div id="matches"></div>
+      </section>
+
+      <details class="card how-to">
+        <summary>¿Dónde se guarda esto?</summary>
+        <p>En ningún celular: la liga vive en <code>liga.json</code>, adentro del repo. Así todos ven la misma tabla y nadie puede decir "en mi celu yo iba ganando".</p>
+        <p>Cuando terminás una partida, tocá <strong>Anotar en la temporada</strong>, copiá el <code>liga.json</code> y pegalo en GitHub (o mandáselo a Claude para que lo suba). Hasta que lo subas queda como "sin guardar" y se pierde si recargás la página.</p>
+        <p>Las temporadas van de julio a junio, como en el fútbol europeo. Pero con peores jugadores.</p>
+      </details>
+    </main>
+
+    <footer class="footer">
+      <p>Jugá responsablemente. O por lo menos pagá responsablemente.</p>
+    </footer>
   </div>
 
+  <div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
+
   <script src="app.js"></script>
+  <script src="liga.js"></script>
 </body>
 </html>
